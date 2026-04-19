@@ -14,6 +14,8 @@ CORE_PACKAGES=(
   wlogout
   alacritty
   dolphin
+  otf-hermit-nerd
+  papirus-icon-theme
   networkmanager
   bluez
   bluez-utils
@@ -165,6 +167,7 @@ main() {
   done
 
   require_file "$CONFIG_ROOT/hypr/hyprland.conf"
+  require_file "$CONFIG_ROOT/alacritty/alacritty.toml"
   require_file "$CONFIG_ROOT/waybar/config.jsonc"
   require_file "$CONFIG_ROOT/waybar/style.css"
   require_file "$CONFIG_ROOT/waybar/power_menu.xml"
@@ -179,6 +182,7 @@ main() {
   fi
 
   copy_file "$CONFIG_ROOT/hypr/hyprland.conf" "$HOME/.config/hypr/hyprland.conf" "$force"
+  copy_file "$CONFIG_ROOT/alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml" "$force"
   copy_file "$CONFIG_ROOT/waybar/config.jsonc" "$HOME/.config/waybar/config.jsonc" "$force"
   copy_file "$CONFIG_ROOT/waybar/style.css" "$HOME/.config/waybar/style.css" "$force"
   copy_file "$CONFIG_ROOT/waybar/power_menu.xml" "$HOME/.config/waybar/power_menu.xml" "$force"
