@@ -1,0 +1,129 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 36,
+    "spacing": 4,
+    "exclusive": true,
+    "passthrough": false,
+    "gtk-layer-shell": true,
+    "ipc": "/tmp/waybar.sock",
+
+    "modules-left": [
+        "hyprland/workspaces"
+    ],
+    "modules-center": [
+        "hyprland/window"
+    ],
+    "modules-right": [
+        "bluetooth",
+        "network",
+        "pulseaudio",
+        "custom/power",
+        "clock",
+        "tray"
+    ],
+
+    "hyprland/workspaces": {
+        "disable-scroll": false,
+        "all-outputs": true,
+        "format": "{icon}",
+        "on-scroll-up": "hyprctl dispatch workspace e+1",
+        "on-scroll-down": "hyprctl dispatch workspace e-1",
+        "persistent-workspaces": {
+            "HDMI-A-1": [1, 2, 3, 4, 5],
+            "DP-3": [6, 7, 8, 9, 10]
+        }
+    },
+
+    "hyprland/window": {
+        "format": "{}",
+        "max-length": 40,
+        "rewrite": {
+            "(.*) - Mozilla Firefox": "󰈹",
+            "(.*) - Visual Studio Code": "󰨞",
+            "(.*) - kitty": "󰄠",
+            "(.*) - discord": "󰙯"
+        }
+    },
+
+    "bluetooth": {
+        "format": "",
+        "format-disabled": "󰂲",
+        "format-off": "󰂲",
+        "format-on": "󰂯",
+        "format-connected": "󰂱 {num_connections}",
+        "format-connected-battery": "󰂱 {device_alias} {device_battery_percentage}%",
+        "tooltip-format": "{controller_alias}\t{controller_address}\n\n{num_connections} connected",
+        "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}\t{device_battery_percentage}%",
+        "tooltip": true,
+        "on-click": "blueman-manager",
+        "on-click-right": "blueman-manager",
+        "interval": 30
+    },
+
+    "network": {
+        "format-wifi": " {essid}",
+        "format-ethernet": "󰈀 {ipaddr}",
+        "format-disconnected": "󰖪",
+        "format-linked": "󰈁 {ifname}",
+        "tooltip-format-wifi": "{essid}\nSignal: {signalStrength}%\nIP: {ipaddr}",
+        "tooltip-format-ethernet": "Ethernet\nIP: {ipaddr}\nInterface: {ifname}",
+        "tooltip-format-disconnected": "Disconnected",
+        "format-icons": [
+            "󰤟",
+            "󰤢",
+            "󰤥",
+            "󰤨"
+        ],
+        "on-click": "nm-connection-editor",
+        "on-click-right": "alacritty -e nmtui",
+        "interval": 5
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-bluetooth": "{icon} {volume}%",
+        "format-bluetooth-muted": "󰝟 ",
+        "format-muted": "󰝟",
+        "format-source": "{volume}% ",
+        "format-source-muted": "",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "󰂑",
+            "headset": "󰂑",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": [
+                "",
+                "",
+                ""
+            ]
+        },
+        "scroll-step": 5,
+        "on-click": "pavucontrol",
+        "on-click-right": "pavucontrol",
+        "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+",
+        "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-",
+        "tooltip-format": "Volume: {volume}%\nSink: {desc}"
+    },
+
+    "custom/power": {
+        "format": "⏻",
+        "tooltip": false,
+        "on-click": "wlogout -b 5"
+    },
+
+    "clock": {
+        "format": "󰥔 {:%H:%M}",
+        "format-alt": "󰥔 {:%A, %B %d, %Y}",
+        "tooltip-format": "<tt>{calendar}</tt>",
+        "interval": 60
+    },
+
+    "tray": {
+        "icon-size": 16,
+        "spacing": 8
+    }
+}
