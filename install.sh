@@ -11,19 +11,32 @@ BACKUP_DIR="$BACKUP_ROOT/$TIMESTAMP"
 CORE_PACKAGES=(
   hyprland
   waybar
-  blueman
-  networkmanager
-  network-manager-applet
-  pavucontrol
   wlogout
   alacritty
   dolphin
+  networkmanager
+  bluez
+  bluez-utils
   pipewire
   wireplumber
+  bluetui
+  impala
+  wiremix
+  lazygit
+  btop
+  fastfetch
+  obsidian
+  evince
+  telegram-desktop
 )
 
-OPTIONAL_PACKAGES=(
+OPTIONAL_REPO_PACKAGES=(
   hyprlauncher
+)
+
+OPTIONAL_AUR_PACKAGES=(
+  pinta
+  amneziavpn-bin
 )
 
 usage() {
@@ -37,8 +50,9 @@ Options:
 
 The script:
   1. Installs required CachyOS/Arch packages with pacman
-  2. Backs up existing Hyprland/Waybar config files
-  3. Copies repo config files into ~/.config
+  2. Installs optional AUR packages if yay/paru is available
+  3. Backs up existing Hyprland/Waybar config files
+  4. Copies repo config files into ~/.config
 EOF
 }
 
@@ -89,21 +103,42 @@ copy_file() {
 }
 
 install_packages() {
-  local optional_to_install=()
+  local optional_repo_to_install=()
+  local optional_aur_to_install=()
+  local aur_helper=""
   local pkg
 
   command -v pacman >/dev/null 2>&1 || die "pacman is required for package installation. Re-run with --skip-packages to only copy configs."
 
-  for pkg in "${OPTIONAL_PACKAGES[@]}"; do
+  for pkg in "${OPTIONAL_REPO_PACKAGES[@]}"; do
     if pacman -Si "$pkg" >/dev/null 2>&1; then
-      optional_to_install+=("$pkg")
+      optional_repo_to_install+=("$pkg")
     else
       warn "Optional package not found in repos, skipping: $pkg"
     fi
   done
 
   log "Installing required packages with pacman"
-  sudo pacman -S --needed "${CORE_PACKAGES[@]}" "${optional_to_install[@]}"
+  sudo pacman -S --needed "${CORE_PACKAGES[@]}" "${optional_repo_to_install[@]}"
+
+  if command -v paru >/dev/null 2>&1; then
+    aur_helper="paru"
+  elif command -v yay >/dev/null 2>&1; then
+    aur_helper="yay"
+  fi
+
+  if [[ -n "$aur_helper" ]]; then
+    for pkg in "${OPTIONAL_AUR_PACKAGES[@]}"; do
+      optional_aur_to_install+=("$pkg")
+    done
+
+    if [[ ${#optional_aur_to_install[@]} -gt 0 ]]; then
+      log "Installing optional AUR packages with $aur_helper"
+      "$aur_helper" -S --needed "${optional_aur_to_install[@]}"
+    fi
+  else
+    warn "No AUR helper found (paru/yay). Skipping optional AUR packages: ${OPTIONAL_AUR_PACKAGES[*]}"
+  fi
 }
 
 main() {
@@ -133,6 +168,8 @@ main() {
   require_file "$CONFIG_ROOT/waybar/config.jsonc"
   require_file "$CONFIG_ROOT/waybar/style.css"
   require_file "$CONFIG_ROOT/waybar/power_menu.xml"
+  require_file "$CONFIG_ROOT/autostart/nm-applet.desktop"
+  require_file "$CONFIG_ROOT/autostart/blueman.desktop"
 
   if [[ "$skip_packages" == "false" ]]; then
     install_packages
@@ -144,6 +181,8 @@ main() {
   copy_file "$CONFIG_ROOT/waybar/config.jsonc" "$HOME/.config/waybar/config.jsonc" "$force"
   copy_file "$CONFIG_ROOT/waybar/style.css" "$HOME/.config/waybar/style.css" "$force"
   copy_file "$CONFIG_ROOT/waybar/power_menu.xml" "$HOME/.config/waybar/power_menu.xml" "$force"
+  copy_file "$CONFIG_ROOT/autostart/nm-applet.desktop" "$HOME/.config/autostart/nm-applet.desktop" "$force"
+  copy_file "$CONFIG_ROOT/autostart/blueman.desktop" "$HOME/.config/autostart/blueman.desktop" "$force"
 
   log "Done. Restart Hyprland and Waybar to apply changes."
 }
