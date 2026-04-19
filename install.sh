@@ -31,7 +31,7 @@ CORE_PACKAGES=(
 )
 
 OPTIONAL_REPO_PACKAGES=(
-  hyprlauncher
+  rofi
 )
 
 OPTIONAL_AUR_PACKAGES=(
@@ -170,6 +170,7 @@ main() {
   require_file "$CONFIG_ROOT/waybar/power_menu.xml"
   require_file "$CONFIG_ROOT/autostart/nm-applet.desktop"
   require_file "$CONFIG_ROOT/autostart/blueman.desktop"
+  require_file "$CONFIG_ROOT/rofi/config.rasi"
 
   if [[ "$skip_packages" == "false" ]]; then
     install_packages
@@ -183,6 +184,7 @@ main() {
   copy_file "$CONFIG_ROOT/waybar/power_menu.xml" "$HOME/.config/waybar/power_menu.xml" "$force"
   copy_file "$CONFIG_ROOT/autostart/nm-applet.desktop" "$HOME/.config/autostart/nm-applet.desktop" "$force"
   copy_file "$CONFIG_ROOT/autostart/blueman.desktop" "$HOME/.config/autostart/blueman.desktop" "$force"
+  copy_file "$CONFIG_ROOT/rofi/config.rasi" "$HOME/.config/rofi/config.rasi" "$force"
 
   log "Done. Restart Hyprland and Waybar to apply changes."
 }

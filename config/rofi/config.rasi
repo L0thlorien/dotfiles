@@ -1,0 +1,85 @@
+configuration {
+  modi: "drun";
+  font: "Sans 11";
+  show-icons: true;
+  icon-theme: "Papirus-Dark";
+  drun-display-format: "{name}";
+  disable-history: false;
+  sidebar-mode: false;
+}
+
+* {
+  background: #1a1a1a;
+  background-alt: #242424;
+  foreground: #e0e0e0;
+  border-color: #333333;
+  normal-background: #1a1a1a;
+  normal-foreground: #e0e0e0;
+  alternate-normal-background: #1a1a1a;
+  alternate-normal-foreground: #e0e0e0;
+  selected-normal-background: #2a2a2a;
+  selected-normal-foreground: #33ccff;
+  spacing: 4px;
+}
+
+window {
+  width: 32%;
+  padding: 12px;
+  border: 1px;
+  border-radius: 6px;
+  background-color: @background;
+}
+
+mainbox {
+  spacing: 8px;
+  children: [ "inputbar", "listview" ];
+}
+
+inputbar {
+  padding: 0px 8px 8px 8px;
+  children: [ "entry" ];
+}
+
+entry {
+  placeholder: "Search...";
+  placeholder-color: #888888;
+  text-color: @foreground;
+  background-color: @background-alt;
+  border: 1px;
+  border-color: @border-color;
+  border-radius: 4px;
+  padding: 8px 10px;
+}
+
+listview {
+  margin: 0px 8px;
+  spacing: 2px;
+  lines: 10;
+  scrollbar: false;
+}
+
+element {
+  padding: 6px 10px;
+  spacing: 8px;
+  border-radius: 4px;
+}
+
+element normal.normal {
+  background-color: transparent;
+  text-color: @normal-foreground;
+}
+
+element selected.normal {
+  background-color: @selected-normal-background;
+  text-color: @selected-normal-foreground;
+}
+
+element-icon {
+  background-color: transparent;
+  size: 1em;
+}
+
+element-text {
+  background-color: transparent;
+  text-color: inherit;
+}
