@@ -10,15 +10,25 @@ BACKUP_DIR="$BACKUP_ROOT/$TIMESTAMP"
 
 CORE_PACKAGES=(
   hyprland
+  hyprlock
+  hypridle
   waybar
   wlogout
   alacritty
   dolphin
+  fish
+  zellij
   otf-hermit-nerd
   papirus-icon-theme
+  rofi
   networkmanager
   bluez
   bluez-utils
+  brightnessctl
+  playerctl
+  mako
+  wl-clipboard
+  cliphist
   pipewire
   wireplumber
   bluetui
@@ -32,9 +42,7 @@ CORE_PACKAGES=(
   telegram-desktop
 )
 
-OPTIONAL_REPO_PACKAGES=(
-  rofi
-)
+OPTIONAL_REPO_PACKAGES=()
 
 OPTIONAL_AUR_PACKAGES=(
   pinta
@@ -43,18 +51,18 @@ OPTIONAL_AUR_PACKAGES=(
 
 usage() {
   cat <<'EOF'
-Usage: ./install.sh [--skip-packages] [--force]
+Usage: ./install.sh [--skip-packages]
 
 Options:
   --skip-packages  Do not install packages with pacman.
-  --force          Overwrite existing target files without creating per-file prompts.
   -h, --help       Show this help.
 
 The script:
   1. Installs required CachyOS/Arch packages with pacman
   2. Installs optional AUR packages if yay/paru is available
-  3. Backs up existing Hyprland/Waybar config files
+  3. Backs up existing managed config files
   4. Copies repo config files into ~/.config
+  5. Sets up lock, idle, notifications, clipboard, terminal, and launcher configs
 EOF
 }
 
@@ -88,16 +96,13 @@ backup_file() {
 copy_file() {
   local source="$1"
   local target="$2"
-  local force="$3"
 
   require_file "$source"
   mkdir -p "$(dirname "$target")"
 
   if [[ -f "$target" ]]; then
     backup_file "$target"
-    if [[ "$force" != "true" ]]; then
-      log "Overwriting existing file: $target"
-    fi
+    log "Overwriting existing file: $target"
   fi
 
   install -m 0644 "$source" "$target"
@@ -145,15 +150,11 @@ install_packages() {
 
 main() {
   local skip_packages=false
-  local force=false
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-packages)
         skip_packages=true
-        ;;
-      --force)
-        force=true
         ;;
       -h|--help)
         usage
@@ -167,12 +168,18 @@ main() {
   done
 
   require_file "$CONFIG_ROOT/hypr/hyprland.conf"
+  require_file "$CONFIG_ROOT/hypr/hyprlock.conf"
+  require_file "$CONFIG_ROOT/hypr/hypridle.conf"
+  require_file "$CONFIG_ROOT/hypr/scripts/clipboard-history.sh"
   require_file "$CONFIG_ROOT/alacritty/alacritty.toml"
+  require_file "$CONFIG_ROOT/fish/config.fish"
+  require_file "$CONFIG_ROOT/zellij/config.kdl"
   require_file "$CONFIG_ROOT/waybar/config.jsonc"
   require_file "$CONFIG_ROOT/waybar/style.css"
   require_file "$CONFIG_ROOT/waybar/power_menu.xml"
   require_file "$CONFIG_ROOT/autostart/nm-applet.desktop"
   require_file "$CONFIG_ROOT/autostart/blueman.desktop"
+  require_file "$CONFIG_ROOT/mako/config"
   require_file "$CONFIG_ROOT/rofi/config.rasi"
 
   if [[ "$skip_packages" == "false" ]]; then
@@ -181,16 +188,22 @@ main() {
     log "Skipping package installation"
   fi
 
-  copy_file "$CONFIG_ROOT/hypr/hyprland.conf" "$HOME/.config/hypr/hyprland.conf" "$force"
-  copy_file "$CONFIG_ROOT/alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml" "$force"
-  copy_file "$CONFIG_ROOT/waybar/config.jsonc" "$HOME/.config/waybar/config.jsonc" "$force"
-  copy_file "$CONFIG_ROOT/waybar/style.css" "$HOME/.config/waybar/style.css" "$force"
-  copy_file "$CONFIG_ROOT/waybar/power_menu.xml" "$HOME/.config/waybar/power_menu.xml" "$force"
-  copy_file "$CONFIG_ROOT/autostart/nm-applet.desktop" "$HOME/.config/autostart/nm-applet.desktop" "$force"
-  copy_file "$CONFIG_ROOT/autostart/blueman.desktop" "$HOME/.config/autostart/blueman.desktop" "$force"
-  copy_file "$CONFIG_ROOT/rofi/config.rasi" "$HOME/.config/rofi/config.rasi" "$force"
+  copy_file "$CONFIG_ROOT/hypr/hyprland.conf" "$HOME/.config/hypr/hyprland.conf"
+  copy_file "$CONFIG_ROOT/hypr/hyprlock.conf" "$HOME/.config/hypr/hyprlock.conf"
+  copy_file "$CONFIG_ROOT/hypr/hypridle.conf" "$HOME/.config/hypr/hypridle.conf"
+  copy_file "$CONFIG_ROOT/hypr/scripts/clipboard-history.sh" "$HOME/.config/hypr/scripts/clipboard-history.sh"
+  copy_file "$CONFIG_ROOT/alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml"
+  copy_file "$CONFIG_ROOT/fish/config.fish" "$HOME/.config/fish/config.fish"
+  copy_file "$CONFIG_ROOT/zellij/config.kdl" "$HOME/.config/zellij/config.kdl"
+  copy_file "$CONFIG_ROOT/waybar/config.jsonc" "$HOME/.config/waybar/config.jsonc"
+  copy_file "$CONFIG_ROOT/waybar/style.css" "$HOME/.config/waybar/style.css"
+  copy_file "$CONFIG_ROOT/waybar/power_menu.xml" "$HOME/.config/waybar/power_menu.xml"
+  copy_file "$CONFIG_ROOT/autostart/nm-applet.desktop" "$HOME/.config/autostart/nm-applet.desktop"
+  copy_file "$CONFIG_ROOT/autostart/blueman.desktop" "$HOME/.config/autostart/blueman.desktop"
+  copy_file "$CONFIG_ROOT/mako/config" "$HOME/.config/mako/config"
+  copy_file "$CONFIG_ROOT/rofi/config.rasi" "$HOME/.config/rofi/config.rasi"
 
-  log "Done. Restart Hyprland and Waybar to apply changes."
+  log "Done. Reload Hyprland, then restart or log into a new session for hypridle and mako changes to fully apply. Open a new terminal window for shell/font changes."
 }
 
 main "$@"
