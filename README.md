@@ -8,6 +8,8 @@ Personal CachyOS + Hyprland desktop configuration.
 - `config/hypr/hyprlock.conf` - lockscreen styling
 - `config/hypr/hypridle.conf` - idle and suspend behavior
 - `config/hypr/scripts/clipboard-history.sh` - Rofi clipboard picker
+- `config/hypr/scripts/screenshot-area.sh` - area screenshot to file + clipboard
+- `config/hypr/scripts/screenshot-screen.sh` - full screen screenshot to file + clipboard
 - `config/waybar/` - bar layout, styling, power menu
 - `config/rofi/config.rasi` - app launcher theme
 - `config/alacritty/alacritty.toml` - terminal font configuration
@@ -41,6 +43,8 @@ Desktop integration and utilities:
 - `mako`
 - `wl-clipboard`
 - `cliphist`
+- `grim`
+- `slurp`
 - `pipewire`
 - `wireplumber`
 - `bluetui`
@@ -80,6 +84,8 @@ To only sync configs:
 - `Super + L` - lock screen
 - `Super + V` - clipboard history via Rofi
 - `Super + Shift + V` - toggle floating window
+- `Print` - area screenshot to clipboard + file
+- `Shift + Print` - full screen screenshot to clipboard + file
 - `Alt + Space` - switch keyboard layout (EN/RU)
 
 ## Post-install checklist
@@ -89,4 +95,5 @@ To only sync configs:
 - open a new Alacritty window so font changes apply
 - test lockscreen with `Super + L`
 - test clipboard history with `Super + V`
+- test screenshots with `Print` and `Shift + Print`
 - confirm notifications with `notify-send "test" "mako works"`

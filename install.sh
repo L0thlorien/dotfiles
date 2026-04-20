@@ -29,6 +29,8 @@ CORE_PACKAGES=(
   mako
   wl-clipboard
   cliphist
+  grim
+  slurp
   pipewire
   wireplumber
   bluetui
@@ -171,6 +173,8 @@ main() {
   require_file "$CONFIG_ROOT/hypr/hyprlock.conf"
   require_file "$CONFIG_ROOT/hypr/hypridle.conf"
   require_file "$CONFIG_ROOT/hypr/scripts/clipboard-history.sh"
+  require_file "$CONFIG_ROOT/hypr/scripts/screenshot-area.sh"
+  require_file "$CONFIG_ROOT/hypr/scripts/screenshot-screen.sh"
   require_file "$CONFIG_ROOT/alacritty/alacritty.toml"
   require_file "$CONFIG_ROOT/fish/config.fish"
   require_file "$CONFIG_ROOT/waybar/config.jsonc"
@@ -191,6 +195,8 @@ main() {
   copy_file "$CONFIG_ROOT/hypr/hyprlock.conf" "$HOME/.config/hypr/hyprlock.conf"
   copy_file "$CONFIG_ROOT/hypr/hypridle.conf" "$HOME/.config/hypr/hypridle.conf"
   copy_file "$CONFIG_ROOT/hypr/scripts/clipboard-history.sh" "$HOME/.config/hypr/scripts/clipboard-history.sh"
+  copy_file "$CONFIG_ROOT/hypr/scripts/screenshot-area.sh" "$HOME/.config/hypr/scripts/screenshot-area.sh"
+  copy_file "$CONFIG_ROOT/hypr/scripts/screenshot-screen.sh" "$HOME/.config/hypr/scripts/screenshot-screen.sh"
   copy_file "$CONFIG_ROOT/alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml"
   copy_file "$CONFIG_ROOT/fish/config.fish" "$HOME/.config/fish/config.fish"
   copy_file "$CONFIG_ROOT/waybar/config.jsonc" "$HOME/.config/waybar/config.jsonc"
