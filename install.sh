@@ -17,9 +17,13 @@ CORE_PACKAGES=(
   alacritty
   dolphin
   fish
+  gcc
+  git
+  make
   zellij
   otf-hermit-nerd
   papirus-icon-theme
+  fd
   rofi
   networkmanager
   bluez
@@ -42,9 +46,21 @@ CORE_PACKAGES=(
   obsidian
   evince
   telegram-desktop
-)
+  neovim
+  tree-sitter-cli
+  unzip
+  xclip
+ )
 
 OPTIONAL_REPO_PACKAGES=()
+
+GO_PACKAGES=(
+  go
+)
+
+PYTHON_PACKAGES=(
+  python-pytest
+)
 
 OPTIONAL_AUR_PACKAGES=(
   pinta
@@ -53,10 +69,12 @@ OPTIONAL_AUR_PACKAGES=(
 
 usage() {
   cat <<'EOF'
-Usage: ./install.sh [--skip-packages]
+Usage: ./install.sh [--skip-packages] [--without-python] [--without-go]
 
 Options:
   --skip-packages  Do not install packages with pacman.
+  --without-python Do not install Python runtime packages.
+  --without-go     Do not install Go runtime packages.
   -h, --help       Show this help.
 
 The script:
@@ -64,7 +82,7 @@ The script:
   2. Installs optional AUR packages if yay/paru is available
   3. Backs up existing managed config files
   4. Copies repo config files into ~/.config
-  5. Sets up lock, idle, notifications, clipboard, terminal, and launcher configs
+  5. Sets up lock, idle, notifications, clipboard, terminal, launcher, and Neovim configs
 EOF
 }
 
@@ -112,7 +130,10 @@ copy_file() {
 }
 
 install_packages() {
+  local with_python="$1"
+  local with_go="$2"
   local optional_repo_to_install=()
+  local optional_language_to_install=()
   local optional_aur_to_install=()
   local aur_helper=""
   local pkg
@@ -127,8 +148,32 @@ install_packages() {
     fi
   done
 
+  if [[ "$with_go" == "true" ]]; then
+    for pkg in "${GO_PACKAGES[@]}"; do
+      if pacman -Si "$pkg" >/dev/null 2>&1; then
+        optional_language_to_install+=("$pkg")
+      else
+        warn "Optional Go package not found in repos, skipping: $pkg"
+      fi
+    done
+  else
+    log 'Skipping Go runtime packages'
+  fi
+
+  if [[ "$with_python" == "true" ]]; then
+    for pkg in "${PYTHON_PACKAGES[@]}"; do
+      if pacman -Si "$pkg" >/dev/null 2>&1; then
+        optional_language_to_install+=("$pkg")
+      else
+        warn "Optional Python package not found in repos, skipping: $pkg"
+      fi
+    done
+  else
+    log 'Skipping Python runtime packages'
+  fi
+
   log "Installing required packages with pacman"
-  sudo pacman -S --needed "${CORE_PACKAGES[@]}" "${optional_repo_to_install[@]}"
+  sudo pacman -S --needed "${CORE_PACKAGES[@]}" "${optional_repo_to_install[@]}" "${optional_language_to_install[@]}"
 
   if command -v paru >/dev/null 2>&1; then
     aur_helper="paru"
@@ -152,11 +197,19 @@ install_packages() {
 
 main() {
   local skip_packages=false
+  local with_python=true
+  local with_go=true
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --skip-packages)
         skip_packages=true
+        ;;
+      --without-python)
+        with_python=false
+        ;;
+      --without-go)
+        with_go=false
         ;;
       -h|--help)
         usage
@@ -184,9 +237,14 @@ main() {
   require_file "$CONFIG_ROOT/autostart/blueman.desktop"
   require_file "$CONFIG_ROOT/mako/config"
   require_file "$CONFIG_ROOT/rofi/config.rasi"
+  require_file "$CONFIG_ROOT/nvim/init.lua"
+  require_file "$CONFIG_ROOT/nvim/lua/custom/plugins/editor.lua"
+  require_file "$CONFIG_ROOT/nvim/lua/custom/plugins/debug.lua"
+  require_file "$CONFIG_ROOT/nvim/lua/custom/plugins/testing.lua"
+  require_file "$CONFIG_ROOT/nvim/lua/custom/python.lua"
 
   if [[ "$skip_packages" == "false" ]]; then
-    install_packages
+    install_packages "$with_python" "$with_go"
   else
     log "Skipping package installation"
   fi
@@ -206,8 +264,13 @@ main() {
   copy_file "$CONFIG_ROOT/autostart/blueman.desktop" "$HOME/.config/autostart/blueman.desktop"
   copy_file "$CONFIG_ROOT/mako/config" "$HOME/.config/mako/config"
   copy_file "$CONFIG_ROOT/rofi/config.rasi" "$HOME/.config/rofi/config.rasi"
+  copy_file "$CONFIG_ROOT/nvim/init.lua" "$HOME/.config/nvim/init.lua"
+  copy_file "$CONFIG_ROOT/nvim/lua/custom/plugins/editor.lua" "$HOME/.config/nvim/lua/custom/plugins/editor.lua"
+  copy_file "$CONFIG_ROOT/nvim/lua/custom/plugins/debug.lua" "$HOME/.config/nvim/lua/custom/plugins/debug.lua"
+  copy_file "$CONFIG_ROOT/nvim/lua/custom/plugins/testing.lua" "$HOME/.config/nvim/lua/custom/plugins/testing.lua"
+  copy_file "$CONFIG_ROOT/nvim/lua/custom/python.lua" "$HOME/.config/nvim/lua/custom/python.lua"
 
-  log "Done. Reload Hyprland, then restart or log into a new session for hypridle and mako changes to fully apply. Open a new terminal window for shell/font changes."
+  log "Done. Reload Hyprland, then restart or log into a new session for hypridle and mako changes to fully apply. Open a new terminal window for shell/font changes, then start Neovim once so lazy.nvim can install plugins."
 }
 
 main "$@"

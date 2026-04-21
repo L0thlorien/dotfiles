@@ -14,6 +14,7 @@ Personal CachyOS + Hyprland desktop configuration.
 - `config/rofi/config.rasi` - app launcher theme
 - `config/alacritty/alacritty.toml` - terminal font configuration
 - `config/mako/config` - notifications
+- `config/nvim/` - kickstart.nvim-based Neovim config for Python and Go
 - `config/fish/config.fish` - shell startup
 - `config/zellij/config.kdl` - terminal multiplexer keybinds
 - `config/autostart/` - applet autostart overrides
@@ -31,7 +32,11 @@ Core desktop tools:
 - `alacritty`
 - `dolphin`
 - `fish`
+- `gcc`
+- `git`
+- `make`
 - `zellij`
+- `neovim`
 
 Desktop integration and utilities:
 
@@ -58,6 +63,36 @@ Desktop integration and utilities:
 - `lazygit`
 - `otf-hermit-nerd`
 - `papirus-icon-theme`
+- `fd`
+- `tree-sitter-cli`
+- `unzip`
+- `xclip`
+
+Language runtimes installed by default:
+
+- `go`
+- `python-pytest`
+
+Neovim toolchain installed on first launch via lazy.nvim / Mason:
+
+- kickstart.nvim base config
+- `nvim-tree` file explorer (`<leader>e`)
+- `basedpyright` + `ruff` for Python
+- `gopls` + `goimports`/`gofumpt` for Go
+- `nvim-dap`, `nvim-dap-python`, `nvim-dap-go`
+- `neotest`, `neotest-python`, `neotest-golang`
+- `venv-selector.nvim` for Python virtualenv switching (`<leader>cv`)
+
+Project-level runtime expectations:
+
+- Python projects should provide their own `.venv` / conda env; `python-pytest` is installed by default unless you use `--without-python`
+- Go development requires the `go` package if you want to use `gopls`, Delve, formatting, and tests against local projects
+- Go debugging additionally requires Delve, which Mason installs on first launch
+
+Intentionally excluded:
+
+- AI coding assistants
+- Jupyter / notebook plugins
 
 Optional extras:
 
@@ -70,11 +105,71 @@ Optional extras:
 ./install.sh
 ```
 
+To skip Python packages:
+
+```bash
+./install.sh --without-python
+```
+
+To skip Go packages:
+
+```bash
+./install.sh --without-go
+```
+
+To skip both:
+
+```bash
+./install.sh --without-python --without-go
+```
+
 To only sync configs:
 
 ```bash
 ./install.sh --skip-packages
 ```
+
+Then open Neovim once:
+
+```bash
+nvim
+```
+
+That first launch bootstraps lazy.nvim and installs the configured plugins and Mason-managed language tools.
+The installer brings in the required Neovim-side CLI dependencies such as `tree-sitter-cli` and `xclip` by default.
+Go and Python runtime packages are installed by default, and can be excluded with `--without-go` and `--without-python`.
+
+### Neovim setup notes
+
+This Neovim config is based on `kickstart.nvim`, but it is not a stock copy. The base editing, completion, Telescope, LSP, Treesitter, and formatting flow still follow kickstart, while the repo adds a Python/Go-focused layer on top.
+
+Main differences from plain kickstart:
+
+- file explorer via `nvim-tree` instead of relying only on Telescope
+- Python workflow centered around `basedpyright`, `ruff`, `venv-selector.nvim`, `nvim-dap-python`, and `neotest-python`
+- Go workflow centered around `gopls`, `goimports` / `gofumpt`, `nvim-dap-go`, and `neotest-golang`
+- shared debug UI and test workflow already wired in
+
+Specialities of this setup:
+
+- **Venv-aware Python flow:** `<leader>cv` switches the active Python environment. The config tries `VIRTUAL_ENV` / `CONDA_PREFIX`, then `.venv` / `venv`, then falls back to system `python3`.
+- **Mason handles editor-side tools:** language servers, formatters, and debug adapters are installed on first launch through Mason rather than being committed into the repo.
+- **Project runtime still matters:** Mason installs editor tooling, but your project still needs its own dependencies. For Python that usually means using a project venv. For Go that means having the `go` toolchain installed locally.
+- **Ruff-first Python formatting:** Python formatting is set up around `ruff format`, not Black.
+- **Go formatting is import-aware:** Go files are formatted with `goimports` and `gofumpt`.
+- **No AI / notebook layer:** this config intentionally avoids Copilot-style plugins and Jupyter integrations to keep the setup focused and predictable.
+
+What to expect on first run:
+
+1. `lazy.nvim` installs plugins
+2. Mason installs LSP / DAP / formatter tools
+3. Treesitter installs parsers
+4. After that, Python files should attach `basedpyright` and Go files should attach `gopls`
+
+If something feels "missing", it is usually one of two things:
+
+- the project runtime/dependencies are not installed yet
+- the first Neovim bootstrap has not finished yet
 
 ## Keybinds
 
@@ -88,11 +183,26 @@ To only sync configs:
 - `Shift + Print` - full screen screenshot to clipboard + file
 - `Alt + Space` - switch keyboard layout (EN/RU)
 
+## Neovim keybinds
+
+- `<leader>e` - toggle nvim-tree file explorer
+- `<leader>fe` - reveal current file in nvim-tree
+- `<leader>cv` - select Python virtualenv
+- `<leader>tn` - run nearest test
+- `<leader>tf` - run current test file
+- `<leader>td` - debug nearest test
+- `<leader>ts` - toggle test summary
+- `<leader>to` - open test output
+- `<F5>` - start / continue debugger
+- `<leader>du` - toggle debugger UI
+
 ## Post-install checklist
 
 - reload Hyprland: `hyprctl reload`
 - restart the session, or manually restart `hypridle` and `mako`, because a reload alone does not replace already-running daemons
 - open a new Alacritty window so font changes apply
+- open Neovim once and wait for lazy.nvim / Mason to finish installing plugins and language tools
+- if Treesitter parsers fail to build, make sure `tree-sitter-cli` is installed (`sudo pacman -S tree-sitter-cli`)
 - test lockscreen with `Super + L`
 - test clipboard history with `Super + V`
 - test screenshots with `Print` and `Shift + Print`
