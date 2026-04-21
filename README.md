@@ -105,6 +105,14 @@ Optional extras:
 ./install.sh
 ```
 
+To install only Neovim on a machine that already has its own desktop setup:
+
+```bash
+./install-nvim.sh
+```
+
+That script only touches `~/.config/nvim`, backs up any existing Neovim config first, and leaves Hyprland / Waybar / Rofi / Mako / shell config alone.
+
 To skip Python packages:
 
 ```bash
@@ -127,6 +135,15 @@ To only sync configs:
 
 ```bash
 ./install.sh --skip-packages
+```
+
+Neovim-only variants:
+
+```bash
+./install-nvim.sh --without-python
+./install-nvim.sh --without-go
+./install-nvim.sh --without-python --without-go
+./install-nvim.sh --skip-packages
 ```
 
 Then open Neovim once:
