@@ -190,12 +190,16 @@ If something feels "missing", it is usually one of two things:
 
 ## Keybinds
 
-- `Super + Q` - open terminal
+- `Super + Return` - open terminal
+- `Super + W` - close focused window
 - `Super + E` - open file manager
+- `Super + F` - fullscreen focused window
 - `Super + R` - app launcher (Rofi)
-- `Super + L` - lock screen
+- `Super + B` - toggle Waybar
+- `Super + T` - toggle floating window
+- `Super + Shift + L` - lock screen
 - `Super + V` - clipboard history via Rofi
-- `Super + Shift + V` - toggle floating window
+- `Super + H/J/K/L` - move focus left/down/up/right
 - `Print` - area screenshot to clipboard + file
 - `Shift + Print` - full screen screenshot to clipboard + file
 - `Alt + Space` - switch keyboard layout (EN/RU)
@@ -220,7 +224,11 @@ If something feels "missing", it is usually one of two things:
 - open a new Alacritty window so font changes apply
 - open Neovim once and wait for lazy.nvim / Mason to finish installing plugins and language tools
 - if Treesitter parsers fail to build, make sure `tree-sitter-cli` is installed (`sudo pacman -S tree-sitter-cli`)
-- test lockscreen with `Super + L`
+- test lockscreen with `Super + Shift + L`
 - test clipboard history with `Super + V`
 - test screenshots with `Print` and `Shift + Print`
 - confirm notifications with `notify-send "test" "mako works"`
+
+## Note
+
+Always update BIOS to avoid cuda/nvidia errors (!)
